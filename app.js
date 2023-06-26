@@ -5,11 +5,11 @@ const port = process.env.PORT;
 const cors = require('cors');
 app.use(express.json());
 app.use(cors());
-require('./database/db');
+require('./source/database/db');
 
-const users = require('./routes/users');
-const uploads = require('./routes/uploads');
-const edificio = require('./routes/edificio');
+const users = require('./source/routes/users');
+const uploads = require('./source/routes/uploads');
+const edificio = require('./source/routes/edificio');
 
 app.use('/users', users);
 app.use('/edificio', edificio);
