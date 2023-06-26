@@ -4,11 +4,10 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const { Types: { ObjectId } } = require('mongoose');
 
-mongoose.connect(process.env.URL, { useNewUrlParser: true, useUnifiedTopology: true });
+const conn = mongoose.createConnection(process.env.URL);
 
 let gfs;
 
-const conn = mongoose.connection;
 conn.once('open', () => {
   // initialize stream
   gfs = new mongoose.mongo.GridFSBucket(conn.db, {
@@ -26,7 +25,7 @@ const storage = new GridFsStorage({
         filename: file.originalname,
         bucketName: 'uploads',
         metadata: {
-          userId: req.body.userId, // Add userId parameter from client side
+          userId: req.body, // Add userId parameter from client side
         }
       };
       resolve(fileInfo);
@@ -53,6 +52,10 @@ const uploadFile = (req, res) => {
 
 const getPdfsEspecifico = async (req, res) => {
   try {
+    const gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: 'uploads'
+    });
+
     const fileId = new ObjectId(req.params.fileId);
     const files = await gfs.find({ '_id': fileId }).sort({ uploadDate: -1 }).toArray();
 
@@ -72,7 +75,11 @@ const getPdfsEspecifico = async (req, res) => {
 
 const getPdf = async (req, res) => {
   try {
-    const files = await gfs.find({ 'metadata.userId': req.params.userId, 'metadata.tipo': 'recibo' }).sort({ uploadDate: -1 }).toArray();
+    const gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: 'uploads'
+    });
+
+    const files = await gfs.find({ 'metadata.userId.userId': req.params.userId, 'metadata.userId.tipo': 'recibo'}).sort({ uploadDate: -1 }).toArray();
 
     if (files.length > 0) {
       const file = files[0];
@@ -90,7 +97,11 @@ const getPdf = async (req, res) => {
 
 const getPdfComprobante = async (req, res) => {
   try {
-    const files = await gfs.find({ 'metadata.userId': req.params.userId, 'metadata.tipo': 'comprobante' }).sort({ uploadDate: -1 }).toArray();
+    const gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: 'uploads'
+    });
+
+    const files = await gfs.find({ 'metadata.userId.userId': req.params.userId, 'metadata.userId.tipo': 'comprobante'}).sort({ uploadDate: -1 }).toArray();
 
     if (files.length > 0) {
       const file = files[0];
@@ -108,8 +119,12 @@ const getPdfComprobante = async (req, res) => {
 
 const getPdfs = async (req, res) => {
   try {
-    const comprobantesFiles = await gfs.find({ 'metadata.userId': req.params.userId, 'metadata.tipo': 'comprobante' }).sort({ uploadDate: -1 }).toArray();
-    const recibosFiles = await gfs.find({ 'metadata.userId': req.params.userId, 'metadata.tipo': 'recibo' }).sort({ uploadDate: -1 }).toArray();
+    const gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: 'uploads'
+    });
+
+    const comprobantesFiles = await gfs.find({ 'metadata.userId.userId': req.params.userId, 'metadata.userId.tipo': 'comprobante' }).sort({ uploadDate: -1 }).toArray();
+    const recibosFiles = await gfs.find({ 'metadata.userId.userId': req.params.userId, 'metadata.userId.tipo': 'recibo' }).sort({ uploadDate: -1 }).toArray();
 
     const comprobantesUrls = comprobantesFiles.map(file => {
       const stream = gfs.openDownloadStream(file._id);
@@ -162,10 +177,14 @@ const deleteFile = async (req, res) => {
   try {
     const fileId = new ObjectId(req.params.fileId);
 
+    const gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: 'uploads'
+    });
+
     await gfs.delete(fileId);
-    res.status(200).json('Archivo eliminado con éxito.');
+    res.status(200).json('Archivo eliminado con éxito.')
   } catch (error) {
-    res.status(206).json(error.message);
+    res.status(206).json(error.message)
   }
 };
 
