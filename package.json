@@ -5,19 +5,20 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app"
+    "start": "nodemon app",
+    "build": "npm install && rm -fdr dist && mkdir -p dist && cp -R node_modules source app.js dist"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JoseMMTW99/NicoPerez-Proyecto1-Back.git"
+    "url": "git+https://github.com/CristhianLeal/Serpa-Back"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/JoseMMTW99/NicoPerez-Proyecto1-Back/issues"
+    "url": "https://github.com/CristhianLeal/Serpa-Back"
   },
-  "homepage": "https://github.com/JoseMMTW99/NicoPerez-Proyecto1-Back#readme",
+  "homepage": "https://github.com/CristhianLeal/Serpa-Back#readme",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
