@@ -4,10 +4,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const { Types: { ObjectId } } = require('mongoose');
 
-const conn = mongoose.createConnection(process.env.URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
+const conn = mongoose.createConnection(process.env.URL);
 
 let gfs;
 
@@ -20,14 +17,15 @@ conn.once('open', () => {
 
 // Set up storage engine
 const storage = new GridFsStorage({
-  db: conn.db,
+  url: process.env.URL,
+  options: { useNewUrlParser: true, useUnifiedTopology: true },
   file: (req, file) => {
     return new Promise((resolve, reject) => {
       const fileInfo = {
         filename: file.originalname,
         bucketName: 'uploads',
         metadata: {
-          userId: req.body.userId, // Add userId parameter from client side
+          userId: req.body, // Add userId parameter from client side
         }
       };
       resolve(fileInfo);
