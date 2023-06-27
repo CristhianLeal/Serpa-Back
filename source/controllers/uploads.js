@@ -5,6 +5,7 @@ require('dotenv').config();
 const { Types: { ObjectId } } = require('mongoose');
 
 const conn = mongoose.createConnection(process.env.URL);
+console.log("mongodb+srv://uppering:nicris1234@uppering.v566enr.mongodb.net/test")
 console.log(process.env.URL)
 
 let gfs;
