@@ -5,6 +5,7 @@ require('dotenv').config();
 const { Types: { ObjectId } } = require('mongoose');
 
 const conn = mongoose.createConnection(process.env.URL);
+console.log(process.env.URL)
 
 let gfs;
 
