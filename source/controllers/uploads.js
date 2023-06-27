@@ -3,8 +3,11 @@ const { GridFsStorage } = require('multer-gridfs-storage');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const { Types: { ObjectId } } = require('mongoose');
-const hola ="mongodb+srv://uppering:nicris1234@uppering.v566enr.mongodb.net/test"
-const conn = mongoose.createConnection(hola);
+
+const conn = mongoose.createConnection(process.env.URL);
+console.log(process.env.URL)
+console.log("mongodb+srv://uppering:nicris1234@uppering.v566enr.mongodb.net/test")
+
 
 let gfs;
 
@@ -17,7 +20,7 @@ conn.once('open', () => {
 
 // Set up storage engine
 const storage = new GridFsStorage({
-  url: hola,
+  url: process.env.URL,
   options: { useNewUrlParser: true, useUnifiedTopology: true },
   file: (req, file) => {
     return new Promise((resolve, reject) => {
