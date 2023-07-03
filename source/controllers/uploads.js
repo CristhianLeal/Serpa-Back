@@ -117,6 +117,28 @@ const getPdfComprobante = async (req, res) => {
     res.status(206).json({ error: 'Failed to get PDFs' });
   }
 };
+const getPdfExpensa = async (req, res) => {
+  try {
+    const gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: 'uploads'
+    });
+
+    const files = await gfs.find({ 'metadata.userId.userId': req.params.userId, 'metadata.userId.tipo': 'expensa'}).sort({ uploadDate: -1 }).toArray();
+
+    if (files.length > 0) {
+      const file = files[0];
+      const stream = gfs.openDownloadStream(file._id);
+      res.set('Content-Type', file.contentType);
+      stream.pipe(res);
+    } else {
+      res.status(206).json({ message: 'No hay ningúna expensa.' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(206).json({ error: 'Failed to get PDFs' });
+  }
+};
+
 
 const getPdfs = async (req, res) => {
   try {
@@ -126,6 +148,7 @@ const getPdfs = async (req, res) => {
 
     const comprobantesFiles = await gfs.find({ 'metadata.userId.userId': req.params.userId, 'metadata.userId.tipo': 'comprobante' }).sort({ uploadDate: -1 }).toArray();
     const recibosFiles = await gfs.find({ 'metadata.userId.userId': req.params.userId, 'metadata.userId.tipo': 'recibo' }).sort({ uploadDate: -1 }).toArray();
+    const expensasFiles = await gfs.find({ 'metadata.userId.userId': req.params.userId, 'metadata.userId.tipo': 'expensa' }).sort({ uploadDate: -1 }).toArray();
 
     const comprobantesUrls = comprobantesFiles.map(file => {
       const stream = gfs.openDownloadStream(file._id);
@@ -161,12 +184,29 @@ const getPdfs = async (req, res) => {
       };
     });
 
-    const allUrls = [...comprobantesUrls, ...recibosUrls];
+    const expensasUrls = expensasFiles.map(file => {
+      const stream = gfs.openDownloadStream(file._id);
+      const uploadDate = new Date(file.uploadDate);
+      const formattedDate = uploadDate.toLocaleDateString('es-AR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }).split('/').join('/');
+      return {
+        id: file._id,
+        url: stream.url, // Replace with the appropriate method to generate a URL for the stream
+        name: file.filename,
+        date: formattedDate,
+        type: 'expensa'
+      };
+    });
+
+    const allUrls = [...comprobantesUrls, ...recibosUrls,...expensasUrls];
 
     if (allUrls.length > 0) {
-      res.status(200).json({ comprobantes: comprobantesUrls, recibos: recibosUrls });
+      res.status(200).json({ comprobantes: comprobantesUrls, recibos: recibosUrls,expensas: expensasUrls });
     } else {
-      res.status(206).json({ message: 'No hay ningún comprobante o recibo cargado.' });
+      res.status(206).json({ message: 'No hay ningún comprobante, recibo o expensas cargado.' });
     }
   } catch (error) {
     console.error(error);
@@ -189,4 +229,4 @@ const deleteFile = async (req, res) => {
   }
 };
 
-module.exports = { uploadFile, getPdf, getPdfs, getPdfsEspecifico, deleteFile, getPdfComprobante };
+module.exports = { uploadFile, getPdf, getPdfs, getPdfsEspecifico, deleteFile, getPdfComprobante,getPdfExpensa };
