@@ -77,9 +77,13 @@ const updateDate = async (req, res) => {
       date: date.toLocaleDateString('es-ES'),
     })
     res.status(200).send(`Se actualizo la fecha con éxito.`)
-  } else {
+  } else if (tipo === "comprobante"){
     await User.findByIdAndUpdate(id, {
       dateComprobante: date.toLocaleDateString('es-ES'),
+    })
+  } else if (tipo === "expensa"){
+    await User.findByIdAndUpdate(id, {
+      dateExpensa: date.toLocaleDateString('es-ES'),
     })
     res.status(200).send(`Se actualizo la fecha con éxito.`)
   }} else{
