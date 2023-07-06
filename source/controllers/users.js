@@ -27,7 +27,7 @@ const getUserEspecifico = async (req, res) => {
       } catch (error) {
         res.status(206).json({ error: error.message });
       }
-    }
+}
 
 const crearUser = async (req, res) => {
     const { name, surname, email, password, dni, edificio, piso, puerta, tipo, baulera } = req.body;
@@ -81,6 +81,7 @@ const updateDate = async (req, res) => {
     await User.findByIdAndUpdate(id, {
       dateComprobante: date.toLocaleDateString('es-ES'),
     })
+    res.status(200).send(`Se actualizo la fecha con éxito.`)
   } else if (tipo === "expensa"){
     await User.findByIdAndUpdate(id, {
       dateExpensa: date.toLocaleDateString('es-ES'),
