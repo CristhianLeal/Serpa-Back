@@ -13,6 +13,7 @@ const user = new Schema({
     baulera: String,
     date: String,
     dateComprobante: String,
+    dateExpensa: String,
     role: String
 })
 
