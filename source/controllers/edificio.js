@@ -13,17 +13,29 @@ const getEdificio = async (req, res) => {
 
 const getEdificioEspecifico = async (req, res) => {
     const { id } = req.params;
-    
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(206).send('Invalid ID');
     }
-      try {
+    try {
         const edificio = await Edificio.findById(id);
         res.status(200).send(edificio);
-      } catch (error) {
+    } catch (error) {
         res.status(206).json({ error: error.message });
-      }
     }
+}
+
+const getEdificioName = async (req, res) => {
+    const { name } = req.params
+    try {
+      const edificio = await Edificio.findOne({ name: name })
+      if (!edificio) {
+        return res.status(404).send('Edificio not found')
+      }
+      res.status(200).send(edificio)
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+}
 
 const crearEdificio = async (req, res) => {
     const { name } = req.body;
@@ -54,7 +66,21 @@ const patchEdificio = async (req, res) => {
     await Edificio.findByIdAndUpdate(id, {
         name
     })
-    res.status(200).send(`Se actualizo el usuario con éxito.`)
+    res.status(200).send(`Se actualizo el edificio con éxito.`)
 };
 
-module.exports = { crearEdificio, getEdificio, deleteEdificio, patchEdificio, getEdificioEspecifico }
+const updateEdif = async (req, res) => {
+    const { id, tipo } = req.body
+    if(id){
+    const date = new Date();
+    if (tipo === "expensa"){
+      await Edificio.findByIdAndUpdate(id, {
+        dateExpensa: date.toLocaleDateString('es-ES'),
+      })
+      res.status(200).send(`Se actualizo la fecha con éxito.`)
+    }} else{
+    res.status(206).send(`No id.`)
+    }
+  };
+
+module.exports = { crearEdificio, getEdificio, deleteEdificio, patchEdificio, getEdificioEspecifico, getEdificioName,updateEdif }

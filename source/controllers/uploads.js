@@ -5,8 +5,6 @@ require('dotenv').config();
 const { Types: { ObjectId } } = require('mongoose');
 
 const conn = mongoose.createConnection(process.env.URL);
-
-
 let gfs;
 
 conn.once('open', () => {
@@ -16,7 +14,6 @@ conn.once('open', () => {
   });
 });
 
-// Set up storage engine
 const storage = new GridFsStorage({
   url: process.env.URL,
   options: { useNewUrlParser: true, useUnifiedTopology: true },
@@ -26,7 +23,7 @@ const storage = new GridFsStorage({
         filename: file.originalname,
         bucketName: 'uploads',
         metadata: {
-          userId: req.body, // Add userId parameter from client side
+          userId: req.body,
         }
       };
       resolve(fileInfo);
@@ -117,6 +114,7 @@ const getPdfComprobante = async (req, res) => {
     res.status(206).json({ error: 'Failed to get PDFs' });
   }
 };
+
 const getPdfExpensa = async (req, res) => {
   try {
     const gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
@@ -138,7 +136,6 @@ const getPdfExpensa = async (req, res) => {
     res.status(206).json({ error: 'Failed to get PDFs' });
   }
 };
-
 
 const getPdfs = async (req, res) => {
   try {
